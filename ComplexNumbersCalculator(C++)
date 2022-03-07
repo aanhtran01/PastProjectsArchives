@@ -1,0 +1,242 @@
+#include <iostream>
+#include <stdio.h>
+#include <iomanip>
+#include <cassert>
+#include <cmath>
+#include <vector>
+using namespace std;
+
+class Complex {
+private:
+    double real, imag;
+public:
+    // default constructor
+    Complex();
+    Complex(const double, const double);
+    Complex(const Complex&);
+
+    // accessors
+    double get_real() const;
+    double get_imag() const;
+    double norm() const;
+    void display() const;
+
+    // mutators
+    void set_real(double);
+    void set_imag(double);
+    void set_value(double, double);
+    //Operator Overloading functions
+    Complex operator +(Complex const&);
+    Complex operator -(Complex const&);
+    Complex operator *(const double);
+    Complex operator *(Complex const&);
+    Complex operator /(Complex const&);
+};
+
+
+class ComplexVector: public Complex{
+private:
+public:
+    ComplexVector();
+    ComplexVector(double real, double imag,vector <Complex> vec);
+    ComplexVector(vector <Complex> vec);
+    
+    ComplexVector operator +(ComplexVector const&);
+    ComplexVector operator -(ComplexVector const&);
+    ComplexVector operator *(ComplexVector const&);
+    ComplexVector operator /(ComplexVector const&);
+    
+    void print();
+    
+    vector<Complex> complex_vec;
+    
+};
+
+
+
+// default constructor
+Complex::Complex(){
+    real = 0;
+    imag = 0;
+}
+
+Complex::Complex(double re , double im){
+    real = re;
+    imag = im;
+}
+
+Complex::Complex(const Complex& y){
+    real = y.get_real();
+    imag = y.get_imag();
+}
+
+// accessors
+double Complex::get_real() const{
+    return real;
+}
+
+double Complex::get_imag() const{
+    return imag;
+}
+
+void Complex::display() const{
+    if (imag >= 0) {
+        cout << real << "+" << imag << "i" << endl;
+    } else{
+        cout << real << imag << "i" << endl;
+    }
+}
+
+// mutators
+void Complex::set_real(double re){
+    real = re;
+}
+
+void Complex::set_imag(double im){
+    imag = im;
+}
+
+void Complex::set_value(double re, double im){
+    real = re;
+    imag = im;
+}
+
+Complex Complex::operator +(Complex const& y){
+    return Complex(real + y.real, imag + y.imag);
+}
+
+Complex Complex::operator -(Complex const& y){
+    return Complex(real - y.real, imag - y.imag);
+}
+
+Complex Complex::operator *(const double num){
+    return Complex(real*num, imag*num);
+}
+
+// (a + bi)(c + di) = (ac - bd) + (bc + ad)i
+Complex Complex::operator *(Complex const& y){
+    double ac = real*y.real;
+    double bd = imag*y.imag;
+    double bc = imag*y.real;
+    double ad = real*y.imag;
+    
+    return Complex((ac - bd),(bc + ad));
+}
+
+// (a + bi)/(c + di) = (ac + bd)/(c^2 + d^2) + (bc - ad)/(c^2 + d^2)i
+Complex Complex::operator /(Complex const& y){
+    double ac = real*y.real;
+    double bd = imag*y.imag;
+    double bc = imag*y.real;
+    double ad = real*y.imag;
+    
+    double denom = (y.real*y.real)+(y.imag*y.imag);
+    
+    return Complex((ac+bd)/denom,(bc-ad)/denom);
+}
+
+ComplexVector::ComplexVector() : Complex() {}
+
+ComplexVector::ComplexVector(double real, double imag, vector<Complex> vec) : Complex(real, imag), complex_vec(vec) {}
+
+ComplexVector::ComplexVector(vector<Complex>vec) {
+    complex_vec = vec;
+}
+
+
+ComplexVector ComplexVector::operator +(ComplexVector const& a){
+    ComplexVector answer;
+    for(size_t i = 0; i < complex_vec.size(); i++){
+        answer.complex_vec.push_back(complex_vec[i]+a.complex_vec[i]);
+    }
+    return answer;
+}
+
+ComplexVector ComplexVector::operator -(ComplexVector const& a){
+    ComplexVector answer;
+    for(size_t i = 0; i < complex_vec.size(); i++){
+        answer.complex_vec.push_back(complex_vec[i]-a.complex_vec[i]);
+    }
+    return answer;
+}
+
+ComplexVector ComplexVector::operator *(ComplexVector const& a){
+    ComplexVector answer;
+    for(size_t i = 0; i < complex_vec.size(); i++){
+        answer.complex_vec.push_back(complex_vec[i]*a.complex_vec[i]);
+    }
+    return answer;
+}
+
+ComplexVector ComplexVector::operator /(ComplexVector const& a){
+    ComplexVector answer;
+    for(size_t i = 0; i < complex_vec.size(); i++){
+        answer.complex_vec.push_back(complex_vec[i]/a.complex_vec[i]);
+    }
+    return answer;
+}
+
+
+void ComplexVector::print(){
+    cout << "{";
+    for(size_t i = 0; i < complex_vec.size(); i++){
+        if (i < complex_vec.size() -1){
+            if (complex_vec[i].get_imag() >= 0) {
+                cout << fixed << setw(6) << setprecision(1) << complex_vec[i].get_real() << "+" << complex_vec[i].get_imag() << "i, ";
+            } else{
+                cout << fixed << setw(6) << setprecision(1) << complex_vec[i].get_real()<< complex_vec[i].get_imag() << "i, ";
+            }
+        }
+        else if (i == complex_vec.size() -1){
+            if (complex_vec[i].get_imag() >= 0) {
+                cout << fixed << setw(6) << setprecision(1) <<complex_vec[i].get_real() <<" +" << complex_vec[i].get_imag() << "i";
+            } else{
+                cout <<  fixed << setw(6) << setprecision(1) << complex_vec[i].get_real()<< complex_vec[i].get_imag() << "i";
+            }
+        }
+    }
+    cout << "}";
+}
+
+
+int main()
+{
+ 
+    //test functions
+    vector<Complex> first {Complex(2,4), (Complex(3,5)), Complex(-1,-3), Complex(8,10)};
+    vector<Complex> second {Complex(-10,3.5), (Complex(4,7.3)), Complex(2,-8), Complex(10,-142)};
+    
+    ComplexVector v1 = first;
+    ComplexVector v2 = second;
+    
+    ComplexVector add = v1 + v2;
+    ComplexVector subtract = v1 - v2;
+    ComplexVector multiply = v1 * v2;
+    ComplexVector divide = v1 / v2;
+    
+    cout << "     v1 = ";
+    v1.print();
+    cout<< endl;
+    
+    cout << "     v2 = ";
+    v2.print();
+    cout<< endl;
+    
+    cout << "v1 + v2 = ";
+    (v1+v2).print();
+    cout<< endl;
+    
+    cout << "v1 - v2 = ";
+    (v1-v2).print();
+    cout<< endl;
+    
+    cout << "v1 * v2 = ";
+    (v1*v2).print();
+    cout<< endl;
+    
+    cout << "v1 / v2 = ";
+    (v1/v2).print();
+    cout<< endl;
+    
+    return 0;
+}
