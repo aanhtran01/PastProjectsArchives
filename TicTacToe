@@ -1,0 +1,387 @@
+// Creating a TicTacToe Game
+
+#include <stdio.h>
+#include <iostream>
+#include <string>
+
+#define SIZE 3
+
+using namespace std;
+
+class Person{
+
+private:
+    string name;
+    int score;
+    
+public:
+    //Initialize name and score
+    
+    Person(string);
+    
+    //accessor 
+    string get_name() const;
+    int get_score() const;
+    
+    void set_name(string);
+    void running_score();
+    
+};
+
+//Class Game is used to store player infomation and perform the game
+//Game class should have fields for the players, all of which should be pointers to a Person object
+class Game{
+private:
+    //Initialize a 3x3 matrix for tic tac toe grid
+    char grid[SIZE][SIZE];
+    
+    Person* PlayerX;
+    Person* PlayerO; 
+
+    
+public:
+    
+    Game(); //default constructor
+    
+    //accessor:
+    //Create a 3x3 matrix for tic tac toe grid
+    void make_grid();
+   
+    void display_intro();
+    void display_grid();
+    
+    
+    //function to place X into grid
+    void x_turn();
+    
+    void o_turn();
+    char check_win();
+    
+    //function to check if there is a tie
+    bool check_tie();
+    
+    
+};
+
+ //Initialize name and score
+    Person::Person(string input){
+        name = input;
+        score = 0;
+    }
+    string Person::get_name() const{
+        return name;
+    }
+    int Person::get_score() const{
+        return score;
+    }
+    void Person::set_name(string input){
+        name = input;
+    }
+    void Person::running_score(){
+        score++;
+    }
+
+
+
+//Create a 3x3 matrix for tic tac toe grid
+void Game::make_grid(){
+        for (int i = 0; i < SIZE; i++){
+            for(int j = 0; j < SIZE; j++){
+                grid[i][j] = ' ';
+            }
+        }
+    }
+   
+void Game::display_intro(){
+   
+    
+}
+
+void Game::display_grid(){
+        //loop to print board
+        cout << "   1       2       3    " << endl;
+        cout << "1       |       |       " << endl;
+        for (int k = 0; k < SIZE; k++){
+            cout << "     " << char(grid[k][0]) << "  |   " << char(grid[k][1]) <<  "   |    " << char(grid[k][2]);
+            if (k < 2){
+                cout << endl << " -------|-------|-------" << endl;
+                cout << k + 2 << "       |       |       " << endl;
+            }
+            
+            }
+    }
+    
+    
+    //function to place X into grid
+
+void Game::x_turn(){
+        
+        string coord;
+        
+        while (true){
+            cout << endl << PlayerX -> get_name() <<" (X) location:  ";
+            getline(cin, coord); //get input for player name 
+            
+            if (coord != " " ){
+                //to get the first character and third character of each input
+                char val1 = coord.c_str()[0];
+                char val2 = coord.c_str()[2];
+                
+                if ((( val1 >= '1' && val1 != ' ') && (val1 <= '3' && val1 != ' ') ) && (( val2 >= '1' && val2 != ' ') && (val2 <= '3' && val2 != ' ') )){
+                    
+                   
+                    
+                    //converting char into ints
+                    int r = val1 - '0';
+                    int v = val2 - '0';
+                    
+                    //matrix is 0 based therefore you subtract one from the inputs to get the correct coordinates
+                    int row = r - 1;
+                    int col = v - 1;
+                    
+                    char grid_position = grid[row][col];
+                    
+                    //Check to see if the coordinate is taken or not
+                    if(grid_position == 'X' || grid_position == 'O'){
+                        cout << "That position is already taken!";
+                    }
+                    else{
+                    //print X into the coordinate
+                    grid[row][col] = 'X';
+                        break;
+                   }
+                }
+                else {
+                  cout << "You have to enter a valid coordinate.";
+               }
+            }
+            else {
+                cout << "You have to select a valid space to play.";
+            }
+        }
+    }
+    
+    void Game::o_turn(){
+        
+       string coord;
+       
+       while (true){
+          cout << endl << PlayerO -> get_name() << " (O) Mark Location:  ";
+           getline(cin, coord);
+           
+           if (coord != " " ){
+               //to get the first character and third character of each input
+               char val1 = coord.c_str()[0];
+               char val2 = coord.c_str()[2];
+               
+               if ((( val1 >= '1' && val1 != ' ') && (val1 <= '3' && val1 != ' ') ) && (( val2 >= '1' && val2 != ' ') && (val2 <= '3' && val2 != ' ') )){
+                   
+                   //converting char into ints
+                   int r = val1 - '0';
+                   int v = val2 - '0';
+                   
+                   //matrix is 0 based therefore you subtract one from the inputs to get the correct coordinates
+                   int row = r - 1;
+                   int col = v - 1;
+                   
+                   char grid_position = grid[row][col];
+                   
+                    //Check to see if the coordinate is taken or not
+                   if(grid_position == 'X' || grid_position == 'O'){
+                       cout << "That position is already taken!";
+                   }
+                   else{
+                   //print O into the coordinate
+                   grid[row][col] = 'O';
+                       break;
+                  }
+               }
+               else {
+                 cout << "You have to enter a valid coordinate.";
+              }
+           }
+           else {
+               cout << "You have to select a valid space to play.";
+           }
+       }
+   }
+    
+    char Game::check_win(){
+        // only 8 possible ways to win (3 rows, 3 cols, 2 diagonals)
+        /* rows:    (0 0) (0 1) (0 2)           columns:     (0 0) (1 0) (2 0)        diagonals: (0 0) (1 1) (2 2)
+                    (1 0) (1 1) (1 2)                        (0 1) (1 1) (1 2)                   (0 2) (1 1) (2 0)
+                    (2 0) (2 1) (2 2)                        (0 2) (1 2) (2 2)
+        */
+        // Check rows
+        for(int i = 0; i < 3; i++){
+        if(grid[i][0] == grid[i][1] && grid[i][0] == grid[i][2])
+            return grid[i][0]; }
+        // Check columns
+        for(int j = 0; j < 3; j++){
+        if(grid[0][j] == grid[1][j] && grid[0][j] == grid[2][j])
+            return grid[0][j];}
+
+        // Check left diagonals
+        if(grid[0][0] == grid[1][1] && grid[1][1] == grid[2][2])
+            return grid[0][0];
+            
+        // Check right diagonals
+        if(grid[0][2] == grid[1][1] && grid[1][1]==grid[2][0])
+            return grid[0][2];
+        
+        return ' '; //return ' ' to designate wins
+            
+        
+    }
+    
+    //function to check if there is a tie
+    bool Game::check_tie(){
+        bool answer = true; //if tie then function is true
+        for (int i=0;i<3;i++)
+        { for (int j=0;j<3;j++)
+            { char grid_pos = grid[i][j];
+                //finds tie by finding if there are any null values left on the grid when none of the conditions match a win
+                if (grid_pos== ' ')
+                    answer = false;
+                //if there is no tie then it means that there are still null values on the grid and the game can continue
+                }} return answer;
+         
+        
+        }
+
+
+    
+   Game::Game(){
+       
+       //get number of games
+       int num_game;
+       cout<< "Number of games: ";
+       cin >> num_game;
+       cin.ignore(); // using cin and then switching to getline so there is an extra newline so we must ignore that new line
+       
+       string name1;
+       string name2;
+       
+       //get player names
+       cout << "Please enter a name for player X: ";
+       getline(cin, name1);
+       Person PlayerOne(name1); //object to access player X information
+       PlayerX = &PlayerOne; //initializing pointer
+       
+       cout << "Please enter a name for player O: ";
+       getline(cin, name2);
+       Person PlayerTwo(name2); //object to access player X information
+       PlayerO = &PlayerTwo; //initializing pointer
+       
+       cout<< "Player 1 Name: " << PlayerX -> get_name() << endl;
+       cout<< "Player 2 Name: " << PlayerO -> get_name() << endl;
+       
+       cout << "      Tic Tac Toe   " << endl << "   " << name1 << " (X) - " << name2 << " (O)" << endl;
+       
+       cout << endl;
+       
+
+       make_grid(); //set the board
+       display_grid(); //displat the board
+       int i =0; // set a counter
+       while (i < num_game){ //condition where if the counter is equal to the number of games entered, the loop will stop and end the game
+            x_turn();
+           if(check_win() == 'X'){ // check is there is a win or tie
+               display_grid();
+               cout << endl <<PlayerX -> get_name() << " wins this round" << endl;
+               PlayerX -> running_score();
+               i++; //increasing the counter if there is a win
+               if(i < num_game){ //display new game if counter is still smaller than the number of games player wanted to play
+                   make_grid();
+                   display_grid();
+               }
+               else break;
+               
+               //same check win, increase counter, display new game is counter is stil valid
+           }
+           else if (check_win() == 'O'){
+               display_grid();
+               cout << endl <<PlayerO -> get_name() << " wins this round" << endl;
+               PlayerO -> running_score();
+               i++;
+               if(i < num_game){
+                   make_grid();
+                   display_grid();}
+               else break;
+           }
+           else if (check_tie() == true){
+               display_grid();
+               cout << endl << "it's a tie";
+               i++;
+               if(i < num_game){
+                   make_grid();
+                   display_grid();}
+               else break;
+               }
+           else display_grid();
+
+
+                        
+            o_turn();
+               if(check_win() == 'X'){
+                   display_grid();
+                   cout << endl << PlayerX -> get_name() << " wins this round" << endl;
+                   PlayerX -> running_score();
+                   i++;
+                   if(i < num_game){
+                       make_grid();
+                       display_grid();}
+                   else break;
+                   }
+
+               else if (check_win() == 'O'){
+                   display_grid();
+                   cout << endl << PlayerO -> get_name() << " wins this round" << endl;
+                   PlayerO -> running_score();
+                   i++;
+                   if(i < num_game){
+                       make_grid();
+                       display_grid();}
+                   else break;
+               }
+               else if (check_tie() == true){
+                   display_grid();
+                   i++;
+                   cout << endl << "it's a tie";
+                   if(i < num_game){
+                       make_grid();
+                       display_grid(); }
+                   else break;
+                   }
+               else display_grid();
+
+               
+           }
+       
+       //display results
+       
+           
+       cout<< endl << PlayerX -> get_name() << " : " << PlayerX -> get_score() << endl;
+       cout<< endl << PlayerO -> get_name() << " : " << PlayerO -> get_score() << endl;
+   
+       if( PlayerX -> get_score() > PlayerO -> get_score()){
+           cout << "Congratulations " << PlayerX -> get_name() << " . You win!" ;
+       }
+       else if (PlayerX -> get_score() < PlayerO -> get_score()){
+           cout << "Congratulations " << PlayerO -> get_name() << " . You win!" ;
+       }
+       else if (PlayerX -> get_score() == PlayerO -> get_score()){
+           cout << "No one wins it's a draw!" ;
+           
+       }
+           
+           }
+    
+
+
+
+
+int main() {  
+    Game game;   
+    return 0;
+}
