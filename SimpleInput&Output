@@ -1,0 +1,203 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+class textfile {
+    
+private:
+    int num_char;
+    int num_word;
+    int num_line;
+    string file_name;
+
+public:
+    textfile(string nameOfFile); //default constructor
+    
+    int setNum_char();
+    int setNum_word();
+    int setNum_line();
+    
+    string getName();
+    int getNum_char();
+    int getNum_word();
+    int getNum_line();
+
+    //functions to compare both files by the amount of lines
+    //comparing if first file has more lines than second file
+    bool operator > (textfile file) const;
+    //comparing if the files have the same number of lines
+    bool operator == (textfile file) const;
+
+    void display();
+};
+
+
+
+
+//default constructor
+textfile:: textfile(string nameOfFile): file_name(nameOfFile){
+    
+    ifstream name;
+    
+    name.open(nameOfFile);
+    num_char = setNum_char();
+    
+    name.open(nameOfFile);
+    num_word = setNum_word();
+    
+    name.open(nameOfFile);
+    num_line = setNum_line();
+}
+
+
+int textfile::setNum_char(){
+    ifstream name;
+    name.open(file_name);
+    if(name.fail()){
+        cout << "Cannot read from file";} //Check for failure after opening
+    
+    name.seekg(0, ios::beg);
+    int count_char = 0;
+    char c;
+    
+    while (name.get(c)){
+        if (c != '\n' && c != '\r' && c != '\t'){
+            count_char++;
+        }
+        
+        if(!name.peek()){
+            break;
+        }
+    }
+    name.close();
+    num_char = count_char;
+    return count_char++;
+}
+
+int textfile::setNum_word(){
+    ifstream name;
+    name.open(file_name);
+    if(name.fail()){
+        cout << "Cannot read from file";} //Check for failure after opening
+    
+    string s;
+    int count_word = 0;
+    
+    while (!name.eof()){
+        
+        name >> s;
+        count_word++;
+    }
+    
+    name.close();
+    num_word = count_word;
+    return count_word++;
+}
+
+int textfile::setNum_line(){
+    ifstream name;
+    name.open(file_name);
+    if(name.fail()){
+        cout << "Cannot read from file";} //Check for failure after opening
+
+    int count_line = 0;
+    string s = " ";
+    
+    while (getline(name, s)){
+        count_line++; }
+    
+    name.close();
+    num_line = count_line;
+    return count_line++;
+}
+
+string textfile::getName(){
+    return file_name;
+}
+
+int textfile::getNum_char(){
+    return num_char;
+}
+
+int textfile::getNum_word(){
+    return num_word;
+}
+
+int textfile::getNum_line(){
+    return num_line;
+}
+
+//comparing if first file has more lines than second file
+bool textfile::operator > (textfile file) const{
+    if(num_line > file.setNum_line()){
+        return true;
+    }
+    else return false;
+}
+
+//comparing if the files have the same number of lines
+bool textfile::operator == (textfile file) const{
+    if(num_line == file.setNum_line()){
+        return true;
+    }
+    else return false;
+}
+
+void textfile::display(){
+    cout << "File Name: " << file_name << endl << "Number of characters: " << num_char << endl << "Number of words: " << num_word << endl << "Number of lines: " << num_line << endl << endl;
+}
+
+
+
+
+
+int main() {
+    //get filename
+    string filename1;
+    cout << "Please enter a name for the first file: ";
+    getline(cin, filename1);
+    textfile file_1(filename1);
+    
+   // ifstream file_1;
+   // file_1.open(filename1);
+    
+    string filename2;
+    cout << "Please enter a name for the second file: ";
+    getline(cin, filename2);
+    cout<< endl;
+    textfile file_2(filename2);
+    
+    file_1.display();
+    file_2.display();
+    
+  //  ifstream file_2;
+  //  file_2.open(filename2);
+    
+    ofstream out_file;
+    out_file.open("Properties.txt");
+    if(out_file.fail()){
+        cout << "Cannot read from file";} //Check for failure after opening
+    
+    out_file << "File Name: " << file_1.getName() << endl << "Number of characters: " << file_1.getNum_char() << endl << "Number of words: " << file_1.getNum_word() << endl << "Number of lines: " << file_1.getNum_line() << endl << endl;
+    
+    out_file << "File Name: " << file_2.getName() << endl << "Number of characters: " << file_2.getNum_char() << endl << "Number of words: " << file_2.getNum_word() << endl << "Number of lines: " << file_2.getNum_line() << endl << endl;
+    
+    
+    if(file_1 > file_2){
+        out_file << "The file named " << file_2.getName() << " has less lines than " << file_1.getName() << "." << endl;
+    }
+    else if(file_2 > file_1){
+        out_file << "The file named " << file_1.getName() << " has less lines than " << file_2.getName() << "." << endl;
+    }
+    else if (file_1 == file_2){
+        out_file << "The files contain the same amount of lines." << endl;
+    }
+    
+    out_file.close(); 
+    
+    return 0;
+}
