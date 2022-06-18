@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include "max_heap.h"
-#include "Timer.h"
 #include "SimpleMemory.h"
 #include <string>
 #include <iostream>
@@ -15,7 +14,6 @@
 
 int main() {
 // plain vanilla max heap, does things by <
-    _BEGIN_MEMORY_CHECK_
 pic10c::max_heap<int> m_less;
 m_less.insert(3);
 m_less.insert(4);
@@ -76,7 +74,6 @@ s.pop();
 }
 auto time2 = t.tock();
 std::cout << "with N= " << N2 << ": " << time2 << '\n';
-    _END_MEMORY_CHECK_
 return 0;
 }
  
